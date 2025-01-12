@@ -106,7 +106,7 @@ The SC makes use of Graviton snapshots, because every SC call overwrites the `ms
 
 - messages can be send in normal transactions either, but the payload (message length) is limited.
 - using Smart Contracts, the length doesn't matter. The only limit is the gas fee.
-- neither the sender, nor the receiver(s) will be reaveled. Add your own wallet to the receivers to keep track of sended messages. Make sure to use a suited ringsize to send messages.
+- neither the sender, nor the receiver(s) will be reaveled. Add your own wallet to the receivers to keep track of sent messages. Make sure to use a suited ringsize to send messages.
 
 ### How the encryption works
 
