@@ -1,9 +1,14 @@
 # dShout
 
 Store encrypted messages for one or more receivers on chain.
-The message is only encrytped once, since all receivers use the same shared secret.
+The message is only encrypted once, since all receivers use the same shared secret.
 
 ---
+
+## Requirements
+
+- Go
+- Engram (dev branch)
 
 ## Installation
 
