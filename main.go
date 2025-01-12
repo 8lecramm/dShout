@@ -29,7 +29,7 @@ func main() {
 
 	// ask for permission
 	if privateKey, err = GetWalletKey(); err != nil {
-		log_xswd.Panicln("Error asking for private key")
+		log_xswd.Println("No permission for QueryKey")
 		os.Exit(1)
 	}
 

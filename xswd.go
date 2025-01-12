@@ -129,6 +129,7 @@ func (x *XSWD) xswd_send(data []byte) bool {
 	if err := x.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 		return false
 	}
+
 	return true
 }
 
