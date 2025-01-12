@@ -1,8 +1,7 @@
-#TODO
-
 # dShout
 
-Store encrypted messages for one or more receivers on chain
+Store encrypted messages for one or more receivers on chain.
+The message is only encrytped once, since all receivers use the same shared secret.
 
 ---
 
@@ -66,3 +65,57 @@ dShout needs the following permissions:
 - click on **Check for messages**
 - a popup tells you if there are messages
 - click on **Read messages** to open the message window
+
+---
+
+## Smart Contract
+
+**SCID**: a8ee7e571130342e0b7baa9052ccbfe3c1766cc454403721d2a357e7eda14894
+
+```
+Function Initialize() Uint64
+ 10 STORE("height", BLOCK_HEIGHT())
+ 20 STORE("prev", BLOCK_HEIGHT())
+ 30 RETURN 0 
+End Function 
+
+Function Store(data String) Uint64
+ /*  189 chars = public key (66 chars) + encrypted shared keys (66 chars each) + 1 seperator (1 char) + encrypted message (at least 28 bytes/56 chars) */
+ 10  IF STRLEN(data) < 189 THEN GOTO 130
+ 20  DIM h as Uint64
+ 30  DIM ph as Uint64
+ 40  LET h = BLOCK_HEIGHT()
+ 50  LET ph = LOAD("height")
+ 60  IF h == ph THEN GOTO 100
+ 70  STORE("msg",data)
+ 80  STORE("prev", ph)
+ 90  GOTO 110
+ 100 STORE("test", h)
+ 101 STORE("msg",LOAD("msg")+"+"+data)
+ 110 STORE("height",h)
+ 120 RETURN 0
+ 130 RETURN 1
+End Function
+```
+
+The SC makes use of Graviton snapshots, because every SC call overwrites the `msg` variable, but previous values are still accessible.
+
+---
+
+## Technical
+
+- messages can be send in normal transactions either, but the payload (message length) is limited.
+- using Smart Contracts, the length doesn't matter. The only limit is the gas fee.
+- neither the sender, nor the receiver(s) will be reaveled. Add your own wallet to the receivers to keep track of sended messages. Make sure to use a suited ringsize to send messages.
+
+### How the encryption works
+
+The sender generates a random "session" key pair (`k = private key, kG = public key`) and a "joint shared key" key pair (`s = private key, sG = public key`).
+Then, calculate the "shared secret" for each receiver (`Y = public key`) and add the "joint shared secret" (`Y*k + sG`). 
+The SHA256 hashed result is the 32 byte "joint shared key". 
+The "session" public key (`kG`) and the commitment (`Y*k + sG`) are included in the message.
+
+### How the decryption works
+
+The receiver uses his private key (`x = private key`) and subtracts the "shared secret" from the commitment (` c - (x*kG) `).
+If you were the real receiver, the result would be the "joint shared secret" (`sG`).
