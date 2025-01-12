@@ -135,10 +135,11 @@ func SC_SyncLoop() (int, error) {
 		return 0, err
 	}
 
+	current_height := SC_Data.Height
+
 	if SC_Data.Height == SC_Data.LastUpdate {
 		return 0, nil
 	}
-	SC_Data.LastUpdate = SC_Data.Height
 
 	var msg_count int
 	for {
@@ -160,8 +161,8 @@ func SC_SyncLoop() (int, error) {
 					Block:   SC_Data.Height,
 					Time:    ts,
 				})
+				msg_count++
 			}
-			msg_count += len(contents)
 		}
 
 		if err := SC_Request(SC_Data.Prev); err != nil {
@@ -169,6 +170,7 @@ func SC_SyncLoop() (int, error) {
 		}
 
 		if SC_Data.Height == SC_Data.Prev || SC_Data.Height == SC_Data.LastUpdate {
+			SC_Data.LastUpdate = current_height
 			break
 		}
 	}

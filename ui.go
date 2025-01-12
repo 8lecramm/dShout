@@ -119,7 +119,7 @@ func MessageWindow(app fyne.App) {
 
 	myMessageWindow := app.NewWindow("dShout - Messages")
 	myMessageWindow.Resize(fyne.NewSize(600, 200))
-	myMessageWindow.SetFixedSize(false)
+	myMessageWindow.SetFixedSize(true)
 
 	message := widget.NewMultiLineEntry()
 	message.SetMinRowsVisible(6)
