@@ -17,7 +17,7 @@ func main() {
 	xswd.AppInfo = &AppicationInfo{
 		Name:        "dShout",
 		Description: "Send messages to one or more users",
-		Url:         "http://localhost",
+		Url:         "https://github.com/8lecramm/dShout",
 	}
 
 	if err := xswd.XSWD_Connect(); err != nil {
