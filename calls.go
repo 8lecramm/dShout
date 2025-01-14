@@ -152,7 +152,10 @@ func SC_SyncLoop() (int, error) {
 
 		if len(contents) > 0 {
 
-			ts, _ := GetTimestamp(SC_Data.Height)
+			ts, err := GetTimestamp(SC_Data.Height)
+			if err != nil {
+				ts = "#no timestamp"
+			}
 			for _, m := range contents {
 				if m == "" {
 					continue
