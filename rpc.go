@@ -5,6 +5,7 @@ const (
 	DAEMON_GET_SC             = "DERO.GetSC"
 	DAEMON_GET_RANDOM_ADDRESS = "DERO.GetRandomAddress"
 	DAEMON_GAS_ESTIMATE       = "DERO.GetGasEstimate"
+	DAEMON_NAME_TO_ADDRESS    = "DERO.NameToAddress"
 	WALLET_QUERY_KEY          = "QueryKey"
 	WALLET_SC_INVOKE          = "scinvoke"
 	WALLET_TRANSFER           = "transfer"
@@ -41,8 +42,8 @@ type (
 
 type (
 	GetBlock_Params struct {
-		Hash   string `json:"hash,omitempty"`   // Monero Daemon breaks if both are provided
-		Height uint64 `json:"height,omitempty"` // Monero Daemon breaks if both are provided
+		Hash   string `json:"hash,omitempty"`
+		Height uint64 `json:"height,omitempty"`
 	} // no params
 	GetBlock_Result struct {
 		Blob         string            `json:"blob"`
@@ -68,12 +69,24 @@ type BlockHeader_Print struct {
 	SyncBlock     bool     `json:"syncblock"`
 	SideBlock     bool     `json:"sideblock"`
 	TXCount       int64    `json:"txcount"`
-	Miners        []string `json:"miners"` // note 1 part goes to integrator/remaining is distributed to all
+	Miners        []string `json:"miners"`
 
 	Reward    uint64   `json:"reward"`
 	Tips      []string `json:"tips"`
 	Timestamp uint64   `json:"timestamp"`
 }
+
+type (
+	NameToAddress_Params struct {
+		Name       string `json:"name"`
+		TopoHeight int64  `json:"topoheight,omitempty"`
+	} // no params
+	NameToAddress_Result struct {
+		Name    string `json:"name"`
+		Address string `json:"address"`
+		Status  string `json:"status"`
+	}
+)
 
 type (
 	GetSC_Params struct {

@@ -17,12 +17,13 @@ import (
 )
 
 const INDENTIFIER = "<DERO ENCRYPTED>"
+const MSG_INPUT = 28 - len(INDENTIFIER)
 const MSG_MIN_LENGTH = 189
 const ZEROHASH = "0000000000000000000000000000000000000000000000000000000000000000"
 
 var privateKey *big.Int
 
-// Return public key and shared key(s)
+// generate and return keys
 func GenerateSharedSecrets(receivers []string) (public_key string, shared_keys []string, key [32]byte, err error) {
 
 	k := crypto.RandomScalar()
@@ -36,10 +37,7 @@ func GenerateSharedSecrets(receivers []string) (public_key string, shared_keys [
 	sy := new(bn256.G1).ScalarMult(crypto.G, s)
 
 	for _, a := range receivers {
-		addr, err := globals.ParseValidateAddress(a)
-		if err != nil {
-			return "", nil, key, err
-		}
+		addr, _ := globals.ParseValidateAddress(a)
 
 		r_pub, err := bn256.Decompress(addr.PublicKey.EncodeCompressed())
 		if err != nil {
@@ -55,6 +53,7 @@ func GenerateSharedSecrets(receivers []string) (public_key string, shared_keys [
 	return public_key, shared_keys, sha_key, nil
 }
 
+// add keyword to identify messages
 func AddKeyword(msg string) string {
 
 	len := len(msg)
@@ -84,6 +83,7 @@ func AddKeyword(msg string) string {
 	return fmt.Sprintf("%s %s %s", msg[:pos[p]], INDENTIFIER, msg[pos[p]+1:])
 }
 
+// message encryption
 func EncryptMessage(msg string, key [32]byte) (encrypted string, modified string, err error) {
 
 	if !strings.Contains(msg, INDENTIFIER) {
@@ -101,6 +101,7 @@ func EncryptMessage(msg string, key [32]byte) (encrypted string, modified string
 	return hex.EncodeToString(data), msg, nil
 }
 
+// chacha20poly1305 encryption
 func EncryptMessageWithKey(Key [32]byte, Data []byte) (result []byte, err error) {
 
 	nonce := make([]byte, chacha20poly1305.NonceSize, chacha20poly1305.NonceSize)
@@ -120,6 +121,7 @@ func EncryptMessageWithKey(Key [32]byte, Data []byte) (result []byte, err error)
 	return
 }
 
+// chacha20poly1305 decryption
 func DecryptMessageWithKey(Key [32]byte, Data []byte) (result []byte, err error) {
 
 	if len(Data) < 28 {
@@ -138,6 +140,7 @@ func DecryptMessageWithKey(Key [32]byte, Data []byte) (result []byte, err error)
 	return cipher.Open(result[:0], nonce, data_without_nonce, nil)
 }
 
+// message decryption
 func DecryptMessages(data string) (contents []string) {
 
 	for _, m := range GetMessages(data) {
@@ -185,6 +188,7 @@ func Decrypt(msg []byte, pubkey []byte, commits [][]byte) (content string, err e
 	return content, nil
 }
 
+// split multiple messages
 func GetMessages(data string) []string {
 
 	if !strings.Contains(data, "+") {
@@ -195,6 +199,7 @@ func GetMessages(data string) []string {
 	return msgs
 }
 
+// message pre-checks
 func SanityCheck(msg string) bool {
 
 	if len(msg) < MSG_MIN_LENGTH {
@@ -225,6 +230,7 @@ func SanityCheck(msg string) bool {
 	return true
 }
 
+// get commitments
 func GetCommitments(msg string) (p []byte, c [][]byte) {
 
 	keys_len := strings.Index(msg, "x") + 1
@@ -239,6 +245,7 @@ func GetCommitments(msg string) (p []byte, c [][]byte) {
 	return
 }
 
+// payload handling
 func GetPayload(msg string) string {
 	return msg[strings.Index(msg, "x")+1:]
 }
@@ -249,6 +256,7 @@ func PayloadCheck(msg string) ([]byte, error) {
 	return hex, err
 }
 
+// get shared keys
 func GetSharedKeys(pubkey []byte, commits [][]byte) (shared_keys [][32]byte, err error) {
 
 	commit := new(bn256.G1)
@@ -263,6 +271,7 @@ func GetSharedKeys(pubkey []byte, commits [][]byte) (shared_keys [][32]byte, err
 	return
 }
 
+// check for message identifier
 func HasIdentifier(msg string) bool {
 	return strings.Contains(msg, INDENTIFIER)
 }

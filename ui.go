@@ -31,7 +31,7 @@ func CreateWindow() fyne.Window {
 	// output fields
 	output := widget.NewEntry()
 
-	// Ringsize dropdown
+	// ringsize dropdown
 	rs_options := []string{"2", "4", "8", "16", "32", "64"}
 	ringsize := widget.NewSelect(rs_options, nil)
 	ringsize.SetSelectedIndex(3)
@@ -43,6 +43,19 @@ func CreateWindow() fyne.Window {
 		in_message.FocusLost()
 
 		addrs := strings.Split(in_wallets.Text, "\n")
+		addrs = ValidateReceivers(addrs)
+
+		if len(addrs) == 0 {
+			output.SetText("no (valid) receivers")
+			output.FocusGained()
+			return
+		}
+		if len(in_message.Text) < MSG_INPUT {
+			output.SetText("no message")
+			output.FocusGained()
+			return
+		}
+
 		p, keys, key, err := GenerateSharedSecrets(addrs)
 		if err != nil {
 			output.SetText(err.Error())
@@ -66,8 +79,10 @@ func CreateWindow() fyne.Window {
 	button2 := widget.NewButton("Send to SC", func() {
 		output.FocusLost()
 		if len(output.Text) >= MSG_MIN_LENGTH {
-			if txid, err := SC_SendMessage(output.Text, ringsize.Selected); err == nil {
-				output.Text = fmt.Sprintf("TXID: %s", txid)
+			if _, err := SC_SendMessage(output.Text, ringsize.Selected); err == nil {
+				// TODO: Transfer response is empty
+				//output.Text = fmt.Sprintf("TXID: %s", txid)
+				output.Text = "Transaction sent!"
 			} else {
 				output.Text = fmt.Sprintf("Error: %s", err.Error())
 			}
@@ -115,6 +130,7 @@ func CreateWindow() fyne.Window {
 	return myWindow
 }
 
+// new window wo view messages
 func MessageWindow(app fyne.App) {
 
 	myMessageWindow := app.NewWindow("dShout - Messages")

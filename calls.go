@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/deroproject/derohe/globals"
 	"github.com/deroproject/derohe/walletapi/mnemonics"
 )
 
@@ -224,6 +225,44 @@ func RPC_GetRandomAddress() string {
 	}
 
 	return ""
+}
+
+func RPC_NameToAddress(name string) string {
+
+	req := RPC_Request(DAEMON_NAME_TO_ADDRESS, NameToAddress_Params{
+		Name:       name,
+		TopoHeight: -1,
+	})
+	data, err := json.Marshal(req)
+	if err != nil {
+		return ""
+	}
+	if !xswd.xswd_send(data) {
+		return ""
+	}
+
+	var r NameToAddress_Result
+	if err = xswd_response(<-xswd.response, &r); err != nil {
+		return ""
+	}
+
+	return r.Address
+}
+
+func ValidateReceivers(r []string) (result []string) {
+
+	for _, a := range r {
+		_, err := globals.ParseValidateAddress(a)
+		if err != nil {
+			if w := RPC_NameToAddress(a); w != "" {
+				result = append(result, w)
+			}
+		} else {
+			result = append(result, a)
+		}
+	}
+
+	return
 }
 
 func BuildTransfer() (t Transfer) {
