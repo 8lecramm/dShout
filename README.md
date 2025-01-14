@@ -1,9 +1,14 @@
 # dShout
 
 Store encrypted messages for one or more receivers on chain.
-The message is only encrytped once, since all receivers use the same shared secret.
+The message is only encrypted once, since all receivers use the same shared secret.
 
 ---
+
+## Requirements
+
+- Go
+- Engram (dev branch)
 
 ## Installation
 
@@ -105,6 +110,8 @@ The SC makes use of Graviton snapshots, because every SC call overwrites the `ms
 ## Technical
 
 - messages can be send in normal transactions either, but the payload (message length) is limited.
+- pruned nodes discard transactions. Messages below pruning height are no longer available.
+- Smart Contracts store keys and values in the SC Meta tree and are also available on pruned nodes.
 - using Smart Contracts, the length doesn't matter. The only limit is the gas fee.
 - neither the sender, nor the receiver(s) will be reaveled. Add your own wallet to the receivers to keep track of sent messages. Make sure to use a suited ringsize to send messages.
 
