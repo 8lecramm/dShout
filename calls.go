@@ -132,7 +132,7 @@ func SC_SendMessage(msg string, ringsize string) (txid string, err error) {
 func SC_SyncLoop() (int, error) {
 
 	if err := SC_Request(0); err != nil {
-		log.Println(err)
+		log_xswd.Println(err)
 		return 0, err
 	}
 
@@ -169,6 +169,7 @@ func SC_SyncLoop() (int, error) {
 			}
 		}
 
+		time.Sleep(50 * time.Millisecond)
 		if err := SC_Request(SC_Data.Prev); err != nil {
 			return msg_count, err
 		}

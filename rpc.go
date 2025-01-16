@@ -1,5 +1,7 @@
 package main
 
+import "encoding/json"
+
 const (
 	DAEMON_BLOCK              = "DERO.GetBlock"
 	DAEMON_GET_SC             = "DERO.GetSC"
@@ -34,9 +36,10 @@ type (
 		ID      string      `json:"id"`
 	}
 	JSONRPCResponse struct {
-		JSONRPC string      `json:"jsonrpc"`
-		Result  interface{} `json:"result"`
-		ID      string      `json:"id"`
+		JSONRPC string          `json:"jsonrpc"`
+		Result  interface{}     `json:"result"`
+		ID      string          `json:"id"`
+		Error   json.RawMessage `json:"error"`
 	}
 )
 

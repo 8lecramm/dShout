@@ -139,8 +139,8 @@ func xswd_response(b []byte, t any) error {
 	if err := json.Unmarshal(b, &temp); err != nil {
 		return err
 	}
-	if temp.Result == nil {
-		return fmt.Errorf("no permission or invalid result")
+	if len(temp.Error) > 0 && string(temp.Error) != "null" {
+		return fmt.Errorf("error response")
 	}
 	data, err := json.Marshal(temp.Result)
 	if err = json.Unmarshal(data, &t); err != nil {
