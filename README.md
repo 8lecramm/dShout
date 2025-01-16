@@ -43,8 +43,7 @@ Follow these steps to set up the project on your local machine:
 ## Usage
 
 1. Start Engram, switch to **Cyberdeck** and go to **Settings**.
-Uncheck **Restrictive Mode** and set **Global Permissions** to `Apply`. 
-Go back and turn **Web Sockets (WS)** on.
+Uncheck **Restrictive Mode**, go back and turn **Web Sockets (WS)** on.
 ---
 dShout needs the following permissions:
 
