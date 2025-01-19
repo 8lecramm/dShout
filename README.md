@@ -1,7 +1,7 @@
 # dShout
 
 Store encrypted messages for one or more receivers on chain.
-The message is only encrypted once, since all receivers use the same shared secret.
+The message is encrypted only once, since all receivers use the same shared secret.
 
 ---
 
@@ -94,8 +94,7 @@ Function Store(data String) Uint64
  70  STORE("msg",data)
  80  STORE("prev", ph)
  90  GOTO 110
- 100 STORE("test", h)
- 101 STORE("msg",LOAD("msg")+"+"+data)
+ 100 STORE("msg",LOAD("msg")+"+"+data)
  110 STORE("height",h)
  120 RETURN 0
  130 RETURN 1
@@ -108,20 +107,7 @@ The SC makes use of Graviton snapshots, because every SC call overwrites the `ms
 
 ## Technical
 
-- messages can be send in normal transactions either, but the payload (message length) is limited.
-- pruned nodes discard transactions. Messages below pruning height are no longer available.
-- Smart Contracts store keys and values in the SC Meta tree and are also available on pruned nodes.
-- using Smart Contracts, the length doesn't matter. The only limit is the gas fee.
-- neither the sender, nor the receiver(s) will be reaveled. Add your own wallet to the receivers to keep track of sent messages. Make sure to use a suited ringsize to send messages.
-
-### How the encryption works
-
-The sender generates a random "session" key pair (`k = private key, kG = public key`) and a "joint shared key" key pair (`s = private key, sG = public key`).
-Then, calculate the "shared secret" for each receiver (`Y = public key`) and add the "joint shared secret" (`Y*k + sG`). 
-The SHA256 hashed result is the 32 byte "joint shared key". 
-The "session" public key (`kG`) and the commitment (`Y*k + sG`) are included in the message.
-
-### How the decryption works
-
-The receiver uses his private key (`x = private key`) and subtracts the "shared secret" from the commitment (` c - (x*kG) `).
-If you were the real receiver, the result would be the "joint shared secret" (`sG`).
+- messaging is also possible with normal transactions, but the payload (message length) is limited.
+- pruned nodes discard transactions. Messages before the pruning height are no longer available.
+- Smart Contracts store keys and values in the SC Meta tree and are available on pruned nodes.
+- neither the sender, nor the receiver(s) will be revealed. Add your own wallet address to the receiver list to keep track of outgoing messages. When sending the message, make sure to use a suited ringsize.
