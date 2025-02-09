@@ -1,3 +1,4 @@
 {
-	"scid"	: "a8ee7e571130342e0b7baa9052ccbfe3c1766cc454403721d2a357e7eda14894"
+	"scid"	 : "a8ee7e571130342e0b7baa9052ccbfe3c1766cc454403721d2a357e7eda14894",
+	"limiter": 10
 }

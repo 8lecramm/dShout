@@ -135,6 +135,7 @@ func SC_SyncLoop() (int, error) {
 		log_xswd.Println(err)
 		return 0, err
 	}
+	rateLimit.Count = 1
 
 	current_height := SC_Data.Height
 
@@ -152,6 +153,9 @@ func SC_SyncLoop() (int, error) {
 
 		if len(contents) > 0 {
 
+			for !rateLimit.Check() {
+				time.Sleep(50 * time.Millisecond)
+			}
 			ts, err := GetTimestamp(SC_Data.Height)
 			if err != nil {
 				ts = "#no timestamp"
@@ -169,7 +173,9 @@ func SC_SyncLoop() (int, error) {
 			}
 		}
 
-		time.Sleep(50 * time.Millisecond)
+		for !rateLimit.Check() {
+			time.Sleep(50 * time.Millisecond)
+		}
 		if err := SC_Request(SC_Data.Prev); err != nil {
 			return msg_count, err
 		}

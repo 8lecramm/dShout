@@ -6,10 +6,12 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Config struct {
-	SCID string `json:"scid"`
+	SCID      string `json:"scid"`
+	RateLimit uint64 `json:"limiter"`
 }
 type SCData struct {
 	Height     uint64
@@ -21,6 +23,10 @@ type MsgDecryped struct {
 	Message string
 	Block   uint64
 	Time    string
+}
+type Limiter struct {
+	Init  time.Time
+	Count uint64
 }
 
 var log_xswd = log.New(os.Stdout, "dShout > ", log.Ldate|log.Ltime)
@@ -37,8 +43,10 @@ var tx_fees = map[uint64]uint64{
 	16:  80,
 	32:  100,
 	64:  120,
-	128: 160,
+	128: 180,
 }
+
+var rateLimit Limiter
 
 func ReadConfig() error {
 
@@ -98,4 +106,19 @@ func SC_Build_GetSC_Request(height uint64) GetSC_Params {
 		TopoHeight: height,
 		KeysString: []string{"height", "prev", "msg"},
 	}
+}
+
+func (l *Limiter) Check() bool {
+	if time.Since(l.Init) > time.Second {
+		l.Init = time.Now()
+		l.Count = 1
+
+		return true
+	}
+	l.Count++
+	if l.Count >= SC_Config.RateLimit {
+		return false
+	}
+
+	return true
 }
